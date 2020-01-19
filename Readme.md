@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Роман Быков](https://up.htmlacademy.ru/javascript/19/user/427583).
-* Наставник: `Неизвестно`.
+* Наставник: `Без наставника`.
 
 ---
 
