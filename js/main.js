@@ -6,6 +6,7 @@ var MAX_LIKES_NUMBER = 200;
 var MIN_AVATAR_NUMBER = 1;
 var MAX_AVATAR_NUMBER = 6;
 var AVATAR_SIZE = 35;
+var COMMENTS_LENGTH = 6;
 
 var messages = [
   'Всё отлично!',
@@ -15,39 +16,8 @@ var messages = [
   'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
-
-var usersComments = [
-  {
-    avatar: 'img/avatar-' + getRandomInt(MIN_AVATAR_NUMBER, MAX_AVATAR_NUMBER) + '.svg',
-    message: messages[getRandomInt(0, messages.length - 1)],
-    name: 'Иван'
-  },
-  {
-    avatar: 'img/avatar-' + getRandomInt(MIN_AVATAR_NUMBER, MAX_AVATAR_NUMBER) + '.svg',
-    message: messages[getRandomInt(0, messages.length - 1)],
-    name: 'Крис'
-  },
-  {
-    avatar: 'img/avatar-' + getRandomInt(MIN_AVATAR_NUMBER, MAX_AVATAR_NUMBER) + '.svg',
-    message: messages[getRandomInt(0, messages.length - 1)],
-    name: 'Александр'
-  },
-  {
-    avatar: 'img/avatar-' + getRandomInt(MIN_AVATAR_NUMBER, MAX_AVATAR_NUMBER) + '.svg',
-    message: messages[getRandomInt(0, messages.length - 1)],
-    name: 'Джошуа'
-  },
-  {
-    avatar: 'img/avatar-' + getRandomInt(MIN_AVATAR_NUMBER, MAX_AVATAR_NUMBER) + '.svg',
-    message: messages[getRandomInt(0, messages.length - 1)],
-    name: 'Чак'
-  },
-  {
-    avatar: 'img/avatar-' + getRandomInt(MIN_AVATAR_NUMBER, MAX_AVATAR_NUMBER) + '.svg',
-    message: messages[getRandomInt(0, messages.length - 1)],
-    name: 'Юэн'
-  }
-];
+var names = ['Элли', 'Крис', 'Джоел', 'Джошуа', 'Чак', 'Юэн'];
+var usersComments = createUsersComments();
 
 var pageBody = document.querySelector('body');
 var pictureTemplate = pageBody.querySelector('#picture').content.querySelector('.picture');
@@ -91,6 +61,22 @@ function removeElementsFromParrent(parrentElement) {
   }
 }
 
+// Создает фейковые комментарии
+function createUsersComments() {
+  var comments = [];
+
+  for (var i = 0; i < COMMENTS_LENGTH; i++) {
+    comments.push({
+      avatar: 'img/avatar-' + getRandomInt(MIN_AVATAR_NUMBER, MAX_AVATAR_NUMBER) + '.svg',
+      message: messages[getRandomInt(0, messages.length - 1)],
+      name: names[getRandomInt(0, names.length - 1)]
+    });
+  }
+
+  return comments;
+}
+
+// Создает фейковые фотографии
 function createPhotos(arr) {
   for (var i = 1; i <= PHOTOS_LENGTH; i++) {
     arr.push({
@@ -104,6 +90,7 @@ function createPhotos(arr) {
   return arr;
 }
 
+// Рендерит фотографию на основе данных из массива
 function renderPhoto(photo) {
   var photoElement = pictureTemplate.cloneNode(true);
 
@@ -114,6 +101,7 @@ function renderPhoto(photo) {
   return photoElement;
 }
 
+// Вставляет отрендеренные фотографии на страницу
 function insertPhotosOnPage(photosArr) {
   var picturesFragment = document.createDocumentFragment();
 
@@ -124,6 +112,7 @@ function insertPhotosOnPage(photosArr) {
   picturesList.appendChild(picturesFragment);
 }
 
+// Создает аватар для комментария
 function createAvatarElement(user) {
   var avatar = document.createElement('img');
 
@@ -136,6 +125,7 @@ function createAvatarElement(user) {
   return avatar;
 }
 
+// Создает элемент комментария, куда входят аватар и текст
 function createCommentElement() {
   var commentLiElement = document.createElement('li');
   commentLiElement.classList.add('social__comment');
@@ -143,6 +133,7 @@ function createCommentElement() {
   return commentLiElement;
 }
 
+// Создает текст комментария
 function createCommentTextElement(comment) {
   var text = document.createElement('p');
   text.classList.add('social__text');
@@ -151,6 +142,7 @@ function createCommentTextElement(comment) {
   return text;
 }
 
+// Рендерит комментарий
 function renderComment(comment) {
   var commentElement = createCommentElement();
   var commentText = createCommentTextElement(comment);
@@ -162,6 +154,7 @@ function renderComment(comment) {
   return commentElement;
 }
 
+// Вставляет кооментарии под приближенной фотографией
 function insertCommentsOnBigPhoto(comments) {
   var commentsFragment = document.createDocumentFragment();
 
@@ -172,6 +165,7 @@ function insertCommentsOnBigPhoto(comments) {
   bigPictureComments.appendChild(commentsFragment);
 }
 
+// Рендерит фотографию крупным планом вместе с комментариями
 function renderBigPhoto(bigPhoto) {
   bigPictureImg.querySelector('img').src = bigPhoto.url;
   bigPictureLikesCount.textContent = bigPhoto.likes;
