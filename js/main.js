@@ -10,6 +10,11 @@ var COMMENTS_LENGTH = 6;
 var ENTER_KEY = 13;
 var ESCAPE_KEY = 27;
 var EFFECT_PIN_OFFSET = 9;
+var MIN_SCALE_SIZE = 25;
+var MAX_SCALE_SIZE = 100;
+var SCALE_STEP = 25;
+var MAX_HASHTAGS_LENGTH = 5;
+var MAX_HASHTAG_LENGTH = 20;
 
 var messages = [
   'Всё отлично!',
@@ -33,6 +38,9 @@ var effectLevelValue = imgUpload.querySelector('.effect-level__value');
 var effectLevelDepth = imgUpload.querySelector('.effect-level__depth');
 var effectLevel = imgUpload.querySelector('.effect-level');
 var imgUploadPreview = imgUpload.querySelector('.img-upload__preview');
+var hashtagInput = imgUpload.querySelector('.text__hashtags');
+var scaleControlValue = imgUpload.querySelector('.scale__control--value');
+var imgUploadPreviewImg = imgUploadPreview.querySelector('img');
 var pageBody = document.querySelector('body');
 var pictureTemplate = pageBody.querySelector('#picture').content.querySelector('.picture');
 var picturesList = pageBody.querySelector('.pictures');
@@ -190,23 +198,6 @@ function renderBigPhoto(bigPhoto) {
   insertCommentsOnBigPhoto(bigPhoto.comments);
 }
 
-function startApp() {
-  var photos = [];
-  createPhotos(photos);
-  var currentPhoto = photos[0];
-
-  insertPhotosOnPage(photos);
-  renderBigPhoto(currentPhoto);
-
-  // pageBody.classList.add('modal-open');
-  bigPictureSocialCommentCount.classList.add('hidden');
-  bigPictureCommentsLoader.classList.add('hidden');
-  // bigPicture.classList.remove('hidden');
-  effectsList.addEventListener('click', effectClickHandler);
-  effectLevelPin.addEventListener('mouseup', effectPinMouseupHandler);
-  uploadFile.addEventListener('change', uploadChangeHandler);
-}
-
 function uploadChangeHandler() {
   openEditingPopup();
 }
@@ -222,7 +213,8 @@ function closePopupPressHandler(evt) {
 }
 
 function escapePressHandler(evt) {
-  if (evt.keyCode === ESCAPE_KEY) {
+  var target = evt.target;
+  if (evt.keyCode === ESCAPE_KEY && !target.classList.contains('text__hashtags')) {
     closeEditingPopup();
   }
 }
@@ -313,9 +305,7 @@ function effectClickHandler(evt) {
   }
 }
 
-var hashtagInput = imgUpload.querySelector('.text__hashtags');
-// var imgUploadForm = imgUpload.querySelector('.img-upload__form');
-
+// Проверяет на дубликаты хештегов
 function checkHashtagRepeats(array) {
   var hasRepeats = array.some(function (item, position) {
     return array.indexOf(item.toLowerCase()) !== position;
@@ -323,26 +313,112 @@ function checkHashtagRepeats(array) {
   return hasRepeats;
 }
 
-function uploadFormSubmitHandler() {
-  var hashtags = hashtagInput.value.split(' ');
+// Проверяет текущий хештег
+function validateHashtagItem(hashtags) {
+  hashtags.forEach(function (hashtag) {
+    switch (true) {
+      case hashtag === '':
+        hashtagInput.setCustomValidity('');
+        break;
+      case (hashtag.length > 1 && hashtag.charAt(0) !== '#'):
+        hashtagInput.setCustomValidity('хэш-тег начинается с символа # (решётка)');
+        break;
+      case (hashtag.length > MAX_HASHTAG_LENGTH):
+        hashtagInput.setCustomValidity('максимальная длина одного хэш-тега 20 символов, включая решётку');
+        break;
+      case (hashtag.length < 2 && hashtag.charAt(0) === '#'):
+        hashtagInput.setCustomValidity('хеш-тег не может состоять только из одной решётки');
+        break;
+      case (!hashtag.substring(1).match(/^[a-zа-я0-9]/gi, '')):
+        hashtagInput.setCustomValidity('строка после решётки должна состоять из букв и чисел и не может содержать пробелы, спецсимволы (#, @, $ и т.п.), символы пунктуации (тире, дефис, запятая и т.п.), эмодзи и т.д.;');
+        break;
 
-  if (hashtags.length > 5) {
+      default:
+        hashtagInput.setCustomValidity('');
+    }
+  });
+}
+
+// Проверяет список хештегов
+function validateHashtagsArray(hashtagsArr) {
+  if (hashtagsArr.length > MAX_HASHTAGS_LENGTH) {
     hashtagInput.setCustomValidity('нельзя указать больше пяти хэш-тегов');
-  } else if (checkHashtagRepeats(hashtags)) {
+  } else if (checkHashtagRepeats(hashtagsArr)) {
     hashtagInput.setCustomValidity('один и тот же хэш-тег не может быть использован дважды');
   } else {
-    for (var i = 0; i < hashtags.length; i++) {
-      if (hashtags[i].charAt(0) !== '#') {
-        hashtagInput.setCustomValidity('хэш-тег начинается с символа # (решётка)');
-      } else if (hashtags[i].length > 20) {
-        hashtagInput.setCustomValidity('максимальная длина одного хэш-тега 20 символов, включая решётку');
-      } else {
-        hashtagInput.setCustomValidity('');
-      }
+    validateHashtagItem(hashtagsArr);
+  }
+}
+
+// Проверяет все хештеги
+function validateHashtags() {
+  var hashtags = hashtagInput.value.split(' ');
+
+  if (hashtags.length > 0) {
+    validateHashtagsArray(hashtags);
+  } else {
+    hashtagInput.setCustomValidity('');
+  }
+}
+
+function uploadFormSubmitHandler() {
+  validateHashtags();
+}
+
+// Увеличивает/уменьшает фотографию
+function scaleImage(isSmaller) {
+  var currentValue = scaleControlValue.value;
+  var currentValueNumber = parseInt(currentValue.substring(0, currentValue.length - 1), 10);
+
+  function setNewScale(number) {
+    imgUploadPreviewImg.style.transform = 'scale(' + number * 0.01 + ')';
+    scaleControlValue.value = number + '%';
+  }
+
+  if (isSmaller) {
+    if (currentValueNumber > MIN_SCALE_SIZE) {
+      currentValueNumber -= SCALE_STEP;
+      setNewScale(currentValueNumber);
+    }
+  } else {
+    if (currentValueNumber < MAX_SCALE_SIZE) {
+      currentValueNumber += SCALE_STEP;
+      setNewScale(currentValueNumber);
     }
   }
 }
 
-hashtagInput.addEventListener('input', uploadFormSubmitHandler);
+// Проверяет, что надо увеличить или уменьшить фотографию и затем делает это
+function toggleImageScale(element) {
+  if (element.classList.contains('scale__control--smaller')) {
+    scaleImage(true);
+  }
+
+  if (element.classList.contains('scale__control--bigger')) {
+    scaleImage();
+  }
+}
+
+function scaleBtnClickHandler(evt) {
+  toggleImageScale(evt.target);
+}
+
+function startApp() {
+  var photos = [];
+  createPhotos(photos);
+  var currentPhoto = photos[0];
+
+  insertPhotosOnPage(photos);
+  renderBigPhoto(currentPhoto);
+
+  bigPictureSocialCommentCount.classList.add('hidden');
+  bigPictureCommentsLoader.classList.add('hidden');
+
+  effectsList.addEventListener('click', effectClickHandler);
+  effectLevelPin.addEventListener('mouseup', effectPinMouseupHandler);
+  uploadFile.addEventListener('change', uploadChangeHandler);
+  hashtagInput.addEventListener('input', uploadFormSubmitHandler);
+  imgUpload.addEventListener('click', scaleBtnClickHandler);
+}
 
 startApp();
