@@ -27,6 +27,16 @@ var messages = [
 var names = ['Элли', 'Крис', 'Джоел', 'Джошуа', 'Чак', 'Юэн'];
 var usersComments = createUsersComments();
 
+var pageBody = document.querySelector('body');
+var pictureTemplate = pageBody.querySelector('#picture').content.querySelector('.picture');
+var picturesList = pageBody.querySelector('.pictures');
+var bigPicture = pageBody.querySelector('.big-picture');
+var bigPictureImg = bigPicture.querySelector('.big-picture__img');
+var bigPictureLikesCount = bigPicture.querySelector('.likes-count');
+var bigPictureCommentsCount = bigPicture.querySelector('.comments-count');
+var bigPictureComments = bigPicture.querySelector('.social__comments');
+var bigPictureSocialCommentCount = bigPicture.querySelector('.social__comment-count');
+var bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
 var imgUpload = document.querySelector('.img-upload');
 var uploadFile = imgUpload.querySelector('#upload-file');
 var imgUploadOverlay = imgUpload.querySelector('.img-upload__overlay');
@@ -41,16 +51,8 @@ var imgUploadPreview = imgUpload.querySelector('.img-upload__preview');
 var hashtagInput = imgUpload.querySelector('.text__hashtags');
 var scaleControlValue = imgUpload.querySelector('.scale__control--value');
 var imgUploadPreviewImg = imgUploadPreview.querySelector('img');
-var pageBody = document.querySelector('body');
-var pictureTemplate = pageBody.querySelector('#picture').content.querySelector('.picture');
-var picturesList = pageBody.querySelector('.pictures');
-var bigPicture = pageBody.querySelector('.big-picture');
-var bigPictureImg = bigPicture.querySelector('.big-picture__img');
-var bigPictureLikesCount = bigPicture.querySelector('.likes-count');
-var bigPictureCommentsCount = bigPicture.querySelector('.comments-count');
-var bigPictureComments = bigPicture.querySelector('.social__comments');
-var bigPictureSocialCommentCount = bigPicture.querySelector('.social__comment-count');
-var bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
+var scaleSmallerBtn = imgUpload.querySelector('.scale__control--smaller');
+var scaleBiggerBtn = imgUpload.querySelector('.scale__control--bigger');
 
 function getRandomInt(min, max) {
   min = Math.ceil(min);
@@ -313,10 +315,18 @@ function checkHashtagRepeats(array) {
   return hasRepeats;
 }
 
-// Проверяет текущий хештег
+// Проверяет текущий хештег, их количество и наличие дубликатов
 function validateHashtagItem(hashtags) {
+  var hasRepeats = checkHashtagRepeats(hashtags);
+
   hashtags.forEach(function (hashtag) {
     switch (true) {
+      case hasRepeats:
+        hashtagInput.setCustomValidity('один и тот же хэш-тег не может быть использован дважды');
+        break;
+      case hashtags.length > MAX_HASHTAGS_LENGTH:
+        hashtagInput.setCustomValidity('нельзя указать больше пяти хэш-тегов');
+        break;
       case hashtag === '':
         hashtagInput.setCustomValidity('');
         break;
@@ -332,22 +342,10 @@ function validateHashtagItem(hashtags) {
       case (!hashtag.substring(1).match(/^[a-zа-я0-9]/gi, '')):
         hashtagInput.setCustomValidity('строка после решётки должна состоять из букв и чисел и не может содержать пробелы, спецсимволы (#, @, $ и т.п.), символы пунктуации (тире, дефис, запятая и т.п.), эмодзи и т.д.;');
         break;
-
       default:
         hashtagInput.setCustomValidity('');
     }
   });
-}
-
-// Проверяет список хештегов
-function validateHashtagsArray(hashtagsArr) {
-  if (hashtagsArr.length > MAX_HASHTAGS_LENGTH) {
-    hashtagInput.setCustomValidity('нельзя указать больше пяти хэш-тегов');
-  } else if (checkHashtagRepeats(hashtagsArr)) {
-    hashtagInput.setCustomValidity('один и тот же хэш-тег не может быть использован дважды');
-  } else {
-    validateHashtagItem(hashtagsArr);
-  }
 }
 
 // Проверяет все хештеги
@@ -355,7 +353,7 @@ function validateHashtags() {
   var hashtags = hashtagInput.value.split(' ');
 
   if (hashtags.length > 0) {
-    validateHashtagsArray(hashtags);
+    validateHashtagItem(hashtags);
   } else {
     hashtagInput.setCustomValidity('');
   }
@@ -366,7 +364,7 @@ function uploadFormSubmitHandler() {
 }
 
 // Увеличивает/уменьшает фотографию
-function scaleImage(isSmaller) {
+function scaleImage(scaleBtn) {
   var currentValue = scaleControlValue.value;
   var currentValueNumber = parseInt(currentValue.substring(0, currentValue.length - 1), 10);
 
@@ -375,32 +373,19 @@ function scaleImage(isSmaller) {
     scaleControlValue.value = number + '%';
   }
 
-  if (isSmaller) {
-    if (currentValueNumber > MIN_SCALE_SIZE) {
-      currentValueNumber -= SCALE_STEP;
-      setNewScale(currentValueNumber);
-    }
-  } else {
-    if (currentValueNumber < MAX_SCALE_SIZE) {
-      currentValueNumber += SCALE_STEP;
-      setNewScale(currentValueNumber);
-    }
-  }
-}
-
-// Проверяет, что надо увеличить или уменьшить фотографию и затем делает это
-function toggleImageScale(element) {
-  if (element.classList.contains('scale__control--smaller')) {
-    scaleImage(true);
+  if (scaleBtn === scaleSmallerBtn && currentValueNumber > MIN_SCALE_SIZE) {
+    currentValueNumber -= SCALE_STEP;
+    setNewScale(currentValueNumber);
   }
 
-  if (element.classList.contains('scale__control--bigger')) {
-    scaleImage();
+  if (scaleBtn === scaleBiggerBtn && currentValueNumber < MAX_SCALE_SIZE) {
+    currentValueNumber += SCALE_STEP;
+    setNewScale(currentValueNumber);
   }
 }
 
 function scaleBtnClickHandler(evt) {
-  toggleImageScale(evt.target);
+  scaleImage(evt.target);
 }
 
 function startApp() {
