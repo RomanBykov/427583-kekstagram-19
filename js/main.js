@@ -383,18 +383,36 @@ function scaleImage(scaleBtn) {
     setNewScale(currentValueNumber);
   }
 }
-
 function scaleBtnClickHandler(evt) {
   scaleImage(evt.target);
 }
 
-function startApp() {
-  var photos = [];
-  createPhotos(photos);
-  var currentPhoto = photos[0];
 
+var photos = [];
+
+function showBigPhoto() {
+  pageBody.classList.add('modal-open');
+  bigPicture.classList.remove('hidden');
+}
+
+function pictureClickHandler(evt) {
+  var target = evt.target;
+
+  if (target.classList.contains('picture__img')) {
+    var currentPhotoID = target.src.split('photos/')[1];
+    var photoId = currentPhotoID.substring(0, currentPhotoID.length - 4) - 1;
+    renderBigPhoto(photos[photoId]);
+    showBigPhoto();
+  }
+}
+
+
+
+picturesList.addEventListener('click', pictureClickHandler);
+
+function startApp() {
+  createPhotos(photos);
   insertPhotosOnPage(photos);
-  renderBigPhoto(currentPhoto);
 
   bigPictureSocialCommentCount.classList.add('hidden');
   bigPictureCommentsLoader.classList.add('hidden');
