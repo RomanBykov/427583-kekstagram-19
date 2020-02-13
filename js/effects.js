@@ -13,16 +13,16 @@
   var effectLevelDepth = imgUpload.querySelector('.effect-level__depth');
   var effectLevel = imgUpload.querySelector('.effect-level');
   var imgUploadPreview = imgUpload.querySelector('.img-upload__preview');
-  var scaleControlValue = imgUpload.querySelector('.scale__control--value');
   var imgUploadPreviewImg = imgUploadPreview.querySelector('img');
-  var scaleSmallerBtn = imgUpload.querySelector('.scale__control--smaller');
-  var scaleBiggerBtn = imgUpload.querySelector('.scale__control--bigger');
+  var imgUploadScale = imgUpload.querySelector('.scale');
+  var scaleControlValue = imgUploadScale.querySelector('.scale__control--value');
+  var scaleSmallerBtn = imgUploadScale.querySelector('.scale__control--smaller');
+  var scaleBiggerBtn = imgUploadScale.querySelector('.scale__control--bigger');
 
   function getCoords(element) {
     var box = element.getBoundingClientRect();
 
     return {
-      top: Math.round(box.top + pageYOffset),
       left: Math.round(box.left + pageXOffset),
       width: Math.round(box.width)
     };
@@ -35,53 +35,120 @@
     return Math.round((pinCoords.left + EFFECT_PIN_OFFSET - lineCoords.left) * 100 / lineCoords.width);
   }
 
-  function effectPinMouseupHandler() {
-    getEffectLevel();
+  var MAX_PIN_POSITION = 453;
+  var MIN_PIN_POSITION = 0;
+
+  function getNewPosition(shiftValue) {
+    var position = effectLevelPin.offsetLeft - shiftValue.x;
+
+    if (position > MAX_PIN_POSITION) {
+      position = MAX_PIN_POSITION;
+    } else if (position < MIN_PIN_POSITION) {
+      position = MIN_PIN_POSITION;
+    }
+
+    return position + 'px';
   }
 
-  function setEffectDefault() {
-    effectLevelPin.style.left = '100%';
-    effectLevelValue.value = 100;
-    effectLevelDepth.style.width = '100%';
+  function pinMoveHandler(evt) {
+    evt.preventDefault();
+
+    var startCoords = {
+      x: evt.clientX
+    };
+
+    var isDragged = false;
+
+    function mouseMoveHandler(moveEvt) {
+      moveEvt.preventDefault();
+
+      isDragged = true;
+
+      var shift = {
+        x: startCoords.x - moveEvt.clientX
+      };
+
+      startCoords = {
+        x: moveEvt.clientX
+      };
+
+      effectLevelPin.style.left = getNewPosition(shift);
+      setEffect();
+    }
+
+    function mouseUpHandler(upEvt) {
+      upEvt.preventDefault();
+
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+
+      function pinClickPreventDefaultHandler(clickEvt) {
+        clickEvt.preventDefault();
+
+        effectLevelPin.removeEventListener('click', pinClickPreventDefaultHandler);
+      }
+
+      if (isDragged) {
+        effectLevelPin.addEventListener('click', pinClickPreventDefaultHandler);
+      }
+    }
+
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
   }
 
-  function addEffect(effect) {
+  function addEffect(effect, isDefault) {
+    var effectLevelNumber = getEffectLevel();
+
+    if (isDefault) {
+      effectLevelNumber = 100;
+      effectLevelPin.style.left = '100%';
+    }
+
+    effectLevelValue.value = effectLevelNumber;
+    effectLevelDepth.style.width = effectLevelNumber + '%';
     imgUploadPreview.style.filter = effect;
+
     return effect === 'none' ? effectLevel.classList.add('hidden') : effectLevel.classList.remove('hidden');
   }
 
-  function setEffect(element) {
-    var target = element.classList;
+  function setEffect(isDefault) {
 
-    switch (true) {
-      case target.contains('effects__preview--chrome'):
-        addEffect('grayscale(1)');
+    var checkedFilter = effectsList.querySelector('.effects__radio:checked');
+    var filterName = checkedFilter.value;
+    var effectValue = isDefault ? 100 : effectLevelValue.value;
+
+    switch (filterName) {
+      case 'chrome':
+        addEffect('grayscale(' + (effectValue * 0.01) + ')', isDefault);
         break;
-      case target.contains('effects__preview--sepia'):
-        addEffect('sepia(1)');
+      case 'sepia':
+        addEffect('sepia(' + (effectValue * 0.01) + ')', isDefault);
         break;
-      case target.contains('effects__preview--marvin'):
-        addEffect('invert(100%)');
+      case 'marvin':
+        addEffect('invert(100%)', isDefault);
         break;
-      case target.contains('effects__preview--phobos'):
-        addEffect('blur(3px)');
+      case 'phobos':
+        addEffect('blur(3px)', isDefault);
         break;
-      case target.contains('effects__preview--heat'):
-        addEffect('brightness(3)');
+      case 'heat':
+        addEffect('brightness(3)', isDefault);
         break;
-      case target.contains('effects__preview--none'):
+      case 'none':
         addEffect('none');
         break;
     }
   }
 
-  function effectClickHandler(evt) {
-    var target = evt.target;
+  // function setEffectToDefault() {
+  //   effectLevelValue.value = 100;
+  //   effectLevelDepth.style.width = '100%';
+  //   imgUploadPreview.style.filter = effect;
+  // }
 
-    if (target.classList.contains('effects__preview')) {
-      setEffectDefault();
-      setEffect(target);
-      getEffectLevel();
+  function effectClickHandler(evt) {
+    if (evt.target.tagName === 'INPUT') {
+      setEffect(true);
     }
   }
 
@@ -107,13 +174,18 @@
   }
 
   function scaleBtnClickHandler(evt) {
-    scaleImage(evt.target);
+    var target = evt.target;
+
+    if (target.classList.contains('scale__control') && target.tagName === 'BUTTON') {
+      scaleImage(target);
+    }
   }
 
   function startApp() {
     effectsList.addEventListener('click', effectClickHandler);
-    effectLevelPin.addEventListener('mouseup', effectPinMouseupHandler);
-    imgUpload.addEventListener('click', scaleBtnClickHandler);
+    effectLevelPin.addEventListener('mousedown', pinMoveHandler);
+    // effectLevelPin.addEventListener('mouseup', effectPinMouseupHandler);
+    imgUploadScale.addEventListener('click', scaleBtnClickHandler);
   }
 
   startApp();
