@@ -126,25 +126,19 @@
         addEffect('sepia(' + (effectValue * 0.01) + ')', isDefault);
         break;
       case 'marvin':
-        addEffect('invert(100%)', isDefault);
+        addEffect('invert(' + effectValue + '%)', isDefault);
         break;
       case 'phobos':
-        addEffect('blur(3px)', isDefault);
+        addEffect('blur(' + effectValue * 0.03 + 'px)', isDefault);
         break;
       case 'heat':
-        addEffect('brightness(3)', isDefault);
+        addEffect('brightness(' + Number(effectValue * 0.02 + 1) + ')', isDefault);
         break;
       case 'none':
         addEffect('none');
         break;
     }
   }
-
-  // function setEffectToDefault() {
-  //   effectLevelValue.value = 100;
-  //   effectLevelDepth.style.width = '100%';
-  //   imgUploadPreview.style.filter = effect;
-  // }
 
   function effectClickHandler(evt) {
     if (evt.target.tagName === 'INPUT') {
