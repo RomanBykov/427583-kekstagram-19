@@ -21,6 +21,9 @@
   var hashtagInput = imgUpload.querySelector('.text__hashtags');
   var imgUploadDescription = imgUpload.querySelector('.text__description');
   var uploadFile = imgUpload.querySelector('#upload-file');
+  var effectLevel = imgUpload.querySelector('.effect-level');
+  var imgUploadPreview = imgUpload.querySelector('.img-upload__preview');
+  var originalFilter = imgUpload.querySelector('#effect-none');
 
   function clearInputValue(inputElement) {
     inputElement.value = '';
@@ -106,8 +109,16 @@
     return target.validity.tooLong ? imgUploadDescription.setCustomValidity(ERROR_MESSAGE.maxDescriptionLength) : imgUploadDescription.setCustomValidity(ERROR_MESSAGE.noError);
   }
 
+  function setImageToDefault() {
+    originalFilter.checked = true;
+    imgUploadPreview.style.filter = 'none';
+    effectLevel.classList.add('hidden');
+  }
+
   function openEditingPopup() {
+    setImageToDefault();
     imgUploadOverlay.classList.remove('hidden');
+
     closeEditBtn.addEventListener('click', closePopupClickHandler);
     closeEditBtn.addEventListener('keydown', closePopupPressHandler);
     document.addEventListener('keydown', escapePressHandler);
