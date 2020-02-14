@@ -35,11 +35,21 @@
     }
   }
 
+  function getCoords(element) {
+    var box = element.getBoundingClientRect();
+
+    return {
+      left: Math.round(box.left + pageXOffset),
+      width: Math.round(box.width)
+    };
+  }
+
   window.common = {
     getRandomInt: getRandomInt,
     getRandomArray: getRandomArray,
     removeElementsFromParrent: removeElementsFromParrent,
     ENTER_KEY: ENTER_KEY,
-    ESCAPE_KEY: ESCAPE_KEY
+    ESCAPE_KEY: ESCAPE_KEY,
+    getCoords: getCoords
   };
 })();

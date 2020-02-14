@@ -5,6 +5,9 @@
   var MIN_SCALE_SIZE = 25;
   var MAX_SCALE_SIZE = 100;
   var SCALE_STEP = 25;
+  var MAX_PIN_POSITION = 453;
+  var MIN_PIN_POSITION = 0;
+  var MAX_EFFECT_LEVEL = 100;
   var imgUpload = document.querySelector('.img-upload');
   var effectLevelPin = imgUpload.querySelector('.effect-level__pin');
   var effectLevelLine = imgUpload.querySelector('.effect-level__line');
@@ -19,24 +22,12 @@
   var scaleSmallerBtn = imgUploadScale.querySelector('.scale__control--smaller');
   var scaleBiggerBtn = imgUploadScale.querySelector('.scale__control--bigger');
 
-  function getCoords(element) {
-    var box = element.getBoundingClientRect();
-
-    return {
-      left: Math.round(box.left + pageXOffset),
-      width: Math.round(box.width)
-    };
-  }
-
   function getEffectLevel() {
-    var lineCoords = getCoords(effectLevelLine);
-    var pinCoords = getCoords(effectLevelPin);
+    var lineCoords = window.common.getCoords(effectLevelLine);
+    var pinCoords = window.common.getCoords(effectLevelPin);
 
     return Math.round((pinCoords.left + EFFECT_PIN_OFFSET - lineCoords.left) * 100 / lineCoords.width);
   }
-
-  var MAX_PIN_POSITION = 453;
-  var MIN_PIN_POSITION = 0;
 
   function getNewPosition(shiftValue) {
     var position = effectLevelPin.offsetLeft - shiftValue.x;
@@ -53,11 +44,11 @@
   function pinMoveHandler(evt) {
     evt.preventDefault();
 
+    var isDragged = false;
+
     var startCoords = {
       x: evt.clientX
     };
-
-    var isDragged = false;
 
     function mouseMoveHandler(moveEvt) {
       moveEvt.preventDefault();
@@ -101,7 +92,7 @@
     var effectLevelNumber = getEffectLevel();
 
     if (isDefault) {
-      effectLevelNumber = 100;
+      effectLevelNumber = MAX_EFFECT_LEVEL;
       effectLevelPin.style.left = '100%';
     }
 
@@ -113,10 +104,9 @@
   }
 
   function setEffect(isDefault) {
-
     var checkedFilter = effectsList.querySelector('.effects__radio:checked');
     var filterName = checkedFilter.value;
-    var effectValue = isDefault ? 100 : effectLevelValue.value;
+    var effectValue = isDefault ? MAX_EFFECT_LEVEL : effectLevelValue.value;
 
     switch (filterName) {
       case 'chrome':
@@ -175,12 +165,7 @@
     }
   }
 
-  function startApp() {
-    effectsList.addEventListener('click', effectClickHandler);
-    effectLevelPin.addEventListener('mousedown', pinMoveHandler);
-    // effectLevelPin.addEventListener('mouseup', effectPinMouseupHandler);
-    imgUploadScale.addEventListener('click', scaleBtnClickHandler);
-  }
-
-  startApp();
+  effectsList.addEventListener('click', effectClickHandler);
+  effectLevelPin.addEventListener('mousedown', pinMoveHandler);
+  imgUploadScale.addEventListener('click', scaleBtnClickHandler);
 })();
