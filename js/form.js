@@ -140,4 +140,5 @@
 
   hashtagInput.addEventListener('input', uploadFormSubmitHandler);
   uploadFile.addEventListener('change', uploadChangeHandler);
+
 })();

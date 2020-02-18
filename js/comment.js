@@ -61,4 +61,5 @@
   window.comments = {
     appendCommentsOnBigPhoto: appendCommentsOnBigPhoto
   };
+
 })();

@@ -52,4 +52,5 @@
     ESCAPE_KEY: ESCAPE_KEY,
     getCoords: getCoords
   };
+
 })();
