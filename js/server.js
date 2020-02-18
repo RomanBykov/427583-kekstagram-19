@@ -45,8 +45,16 @@
     xhr.send();
   }
 
+  function save(data, succesHandler) {
+    var xhr = makeRequest(succesHandler);
+
+    xhr.open('POST', URL);
+    xhr.send(data);
+  }
+
   window.server = {
-    load: load
+    load: load,
+    save: save
   };
 
 })();

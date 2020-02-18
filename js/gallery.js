@@ -58,17 +58,26 @@
     insertPhotosOnPage(photos);
   }
 
+  function removePicturesHandlers(element) {
+    element.removeEventListener('click', pictureClickHandler);
+    element.removeEventListener('keydown', picturePressHandler);
+  }
+
+  function addPicturesHandlers(element) {
+    element.addEventListener('click', pictureClickHandler);
+    element.addEventListener('keydown', picturePressHandler);
+  }
+
   function initGallery() {
     window.server.load(loadSucceshandler);
-    picturesList.addEventListener('click', pictureClickHandler);
-    picturesList.addEventListener('keydown', picturePressHandler);
+    addPicturesHandlers(picturesList);
   }
 
   initGallery();
 
   window.gallery = {
-    pictureClickHandler: pictureClickHandler,
-    picturePressHandler: picturePressHandler
+    removePicturesHandlers: removePicturesHandlers,
+    addPicturesHandlers: addPicturesHandlers
   };
 
 })();

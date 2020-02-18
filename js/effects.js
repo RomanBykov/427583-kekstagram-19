@@ -124,7 +124,7 @@
       case 'heat':
         addEffect('brightness(' + Number(effectValue * 0.02 + 1) + ')', isDefault);
         break;
-      case 'none':
+      default:
         addEffect('none');
         break;
     }
