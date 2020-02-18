@@ -168,4 +168,5 @@
   effectsList.addEventListener('click', effectClickHandler);
   effectLevelPin.addEventListener('mousedown', pinMoveHandler);
   imgUploadScale.addEventListener('click', scaleBtnClickHandler);
+
 })();

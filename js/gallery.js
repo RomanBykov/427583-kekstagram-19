@@ -4,6 +4,7 @@
   var pageBody = document.querySelector('body');
   var pictureTemplate = pageBody.querySelector('#picture').content.querySelector('.picture');
   var picturesList = pageBody.querySelector('.pictures');
+  var loadedPhotos = {};
 
   // Рендерит фотографию на основе данных из массива
   function renderPhoto(photo) {
@@ -29,27 +30,45 @@
 
   function picturePressHandler(evt) {
     var target = evt.target;
+
     if (evt.keyCode === window.common.ENTER_KEY) {
       if (target.classList.contains('picture')) {
         var targetImg = target.querySelector('.picture__img');
-        window.preview.openBigPhoto(targetImg);
+        window.preview.openBigPhoto(targetImg, loadedPhotos);
       }
     }
   }
 
   function pictureClickHandler(evt) {
     var target = evt.target;
+
     if (target.classList.contains('picture__img')) {
-      window.preview.openBigPhoto(target);
+      window.preview.openBigPhoto(target, loadedPhotos);
     }
   }
 
-  picturesList.addEventListener('click', pictureClickHandler);
-  picturesList.addEventListener('keydown', picturePressHandler);
-  insertPhotosOnPage(window.data.photos);
+  function getLoadedPhotos(photosFromServer) {
+    loadedPhotos = photosFromServer;
+
+    return loadedPhotos;
+  }
+
+  function loadSucceshandler(photos) {
+    getLoadedPhotos(photos);
+    insertPhotosOnPage(photos);
+  }
+
+  function initGallery() {
+    window.server.load(loadSucceshandler);
+    picturesList.addEventListener('click', pictureClickHandler);
+    picturesList.addEventListener('keydown', picturePressHandler);
+  }
+
+  initGallery();
 
   window.gallery = {
     pictureClickHandler: pictureClickHandler,
     picturePressHandler: picturePressHandler
   };
+
 })();
