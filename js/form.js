@@ -22,9 +22,12 @@
   var imgUploadDescription = imgUpload.querySelector('.text__description');
   var uploadFile = imgUpload.querySelector('#upload-file');
   var effectLevel = imgUpload.querySelector('.effect-level');
+  var effectLevelValue = effectLevel.querySelector('.effect-level__value');
   var imgUploadPreview = imgUpload.querySelector('.img-upload__preview');
   var originalFilter = imgUpload.querySelector('#effect-none');
   var imgUploadForm = imgUpload.querySelector('.img-upload__form');
+  var pageMain = pageBody.querySelector('main');
+  var errorTemplate = pageBody.querySelector('#error').content.querySelector('.error');
 
   function uploadChangeHandler() {
     openEditingPopup();
@@ -110,6 +113,7 @@
     originalFilter.checked = true;
     imgUploadPreview.style.filter = 'none';
     effectLevel.classList.add('hidden');
+    effectLevelValue.value = 100;
   }
 
   function openEditingPopup() {
@@ -122,6 +126,7 @@
   }
 
   function closeEditingPopup() {
+    setImageToDefault();
     imgUploadOverlay.classList.add('hidden');
     uploadFile.value = '';
     closeEditBtn.removeEventListener('click', closePopupClickHandler);
@@ -130,8 +135,13 @@
     window.gallery.addPicturesHandlers(picturesList);
   }
 
+  function uploadErrorHandler(errorMessage) {
+    window.server.renderErrorMessage(errorMessage);
+    closeEditingPopup();
+  }
+
   function succesUploadHandler(evt) {
-    window.server.save(new FormData(imgUploadForm), closeEditingPopup);
+    window.server.save(new FormData(imgUploadForm), closeEditingPopup, uploadErrorHandler);
     evt.preventDefault();
   }
 
