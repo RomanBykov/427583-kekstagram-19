@@ -10,21 +10,32 @@
   var errorTemplate = pageBody.querySelector('#error').content.querySelector('.error');
   var successTemplate = pageBody.querySelector('#success').content.querySelector('.success');
 
-  function removeErrorMessageCloseListeners() {
-    var errorElement = pageMain.querySelector('.error');
-    errorElement.removeEventListener('click', errorMessageCloseClickHandler);
-    document.removeEventListener('keydown', errorMessageEscapePressHandler);
-    pageMain.removeChild(errorElement);
-  }
-
-  function errorMessageEscapePressHandler(evt) {
+  function messageEscapePressHandler(evt) {
     if (evt.keyCode === ESCAPE_KEY) {
-      removeErrorMessageCloseListeners();
+      removeMessageCloseListeners();
     }
   }
 
-  function errorMessageCloseClickHandler() {
-    removeErrorMessageCloseListeners();
+  function messageCloseClickHandler() {
+    removeMessageCloseListeners();
+  }
+
+  function removeMessageCloseListeners() {
+    document.removeEventListener('click', messageCloseClickHandler);
+    document.removeEventListener('keydown', messageEscapePressHandler);
+
+    if (pageMain.contains(pageMain.querySelector('.error'))) {
+      pageMain.removeChild(pageMain.querySelector('.error'));
+    }
+
+    if (pageMain.contains(pageMain.querySelector('.success'))) {
+      pageMain.removeChild(pageMain.querySelector('.success'));
+    }
+  }
+
+  function addMessageListeners() {
+    document.addEventListener('click', messageCloseClickHandler);
+    document.addEventListener('keydown', messageEscapePressHandler);
   }
 
   function renderErrorMessage(errorMessage) {
@@ -32,22 +43,18 @@
     var errorFragment = document.createDocumentFragment();
 
     errorElement.querySelector('.error__title').textContent = errorMessage;
-    errorElement.addEventListener('click', errorMessageCloseClickHandler);
-    document.addEventListener('keydown', errorMessageEscapePressHandler);
     errorFragment.appendChild(errorElement);
-
     pageMain.appendChild(errorFragment);
+    addMessageListeners();
   }
 
   function renderSuccessMessage() {
     var successElement = successTemplate.cloneNode(true);
     var successFragment = document.createDocumentFragment();
 
-    // successElement.addEventListener('click', errorMessageCloseClickHandler);
-    // document.addEventListener('keydown', errorMessageEscapePressHandler);
     successFragment.appendChild(successElement);
-
     pageMain.appendChild(successFragment);
+    addMessageListeners();
   }
 
 
@@ -59,7 +66,6 @@
     xhr.addEventListener('load', function () {
       if (xhr.status === SUCCESS_CODE) {
         succesHandler(xhr.response);
-        renderSuccessMessage();
       } else {
         errorHandler('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
       }
@@ -93,7 +99,8 @@
   window.server = {
     load: load,
     save: save,
-    renderErrorMessage: renderErrorMessage
+    renderErrorMessage: renderErrorMessage,
+    renderSuccessMessage: renderSuccessMessage
   };
 
 })();

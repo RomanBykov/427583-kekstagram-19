@@ -4,8 +4,8 @@
   var pageBody = document.querySelector('body');
   var pictureTemplate = pageBody.querySelector('#picture').content.querySelector('.picture');
   var picturesList = pageBody.querySelector('.pictures');
-  var pageMain = pageBody.querySelector('main');
-  var errorTemplate = pageBody.querySelector('#error').content.querySelector('.error');
+  // var pageMain = pageBody.querySelector('main');
+  // var errorTemplate = pageBody.querySelector('#error').content.querySelector('.error');
   var loadedPhotos = {};
 
   // Рендерит фотографию на основе данных из массива

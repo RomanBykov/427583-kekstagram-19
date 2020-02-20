@@ -3,6 +3,7 @@
 (function () {
   var MAX_HASHTAGS_LENGTH = 5;
   var MAX_HASHTAG_LENGTH = 20;
+  var DEFAULT_IMAGE_VALUE = 100;
   var ErrorMessage = {
     doubleHashtag: 'один и тот же хэш-тег не может быть использован дважды',
     maxCount: 'нельзя указать больше пяти хэш-тегов',
@@ -26,8 +27,6 @@
   var imgUploadPreview = imgUpload.querySelector('.img-upload__preview');
   var originalFilter = imgUpload.querySelector('#effect-none');
   var imgUploadForm = imgUpload.querySelector('.img-upload__form');
-  var pageMain = pageBody.querySelector('main');
-  var errorTemplate = pageBody.querySelector('#error').content.querySelector('.error');
 
   function uploadChangeHandler() {
     openEditingPopup();
@@ -113,7 +112,10 @@
     originalFilter.checked = true;
     imgUploadPreview.style.filter = 'none';
     effectLevel.classList.add('hidden');
-    effectLevelValue.value = 100;
+    effectLevelValue.value = DEFAULT_IMAGE_VALUE;
+    window.effects.setNewScale(DEFAULT_IMAGE_VALUE);
+    hashtagInput.value = '';
+    imgUploadDescription.value = '';
   }
 
   function openEditingPopup() {
@@ -141,8 +143,9 @@
   }
 
   function succesUploadHandler(evt) {
-    window.server.save(new FormData(imgUploadForm), closeEditingPopup, uploadErrorHandler);
     evt.preventDefault();
+    window.server.save(new FormData(imgUploadForm), closeEditingPopup, uploadErrorHandler);
+    window.server.renderSuccessMessage();
   }
 
   hashtagInput.addEventListener('input', uploadFormSubmitHandler);
