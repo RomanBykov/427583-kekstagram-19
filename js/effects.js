@@ -124,7 +124,7 @@
       case 'heat':
         addEffect('brightness(' + Number(effectValue * 0.02 + 1) + ')', isDefault);
         break;
-      case 'none':
+      default:
         addEffect('none');
         break;
     }
@@ -136,15 +136,15 @@
     }
   }
 
+  function setNewScale(number) {
+    imgUploadPreviewImg.style.transform = 'scale(' + number * 0.01 + ')';
+    scaleControlValue.value = number + '%';
+  }
+
   // Увеличивает/уменьшает фотографию
   function scaleImage(scaleBtn) {
     var currentValue = scaleControlValue.value;
     var currentValueNumber = parseInt(currentValue.substring(0, currentValue.length - 1), 10);
-
-    function setNewScale(number) {
-      imgUploadPreviewImg.style.transform = 'scale(' + number * 0.01 + ')';
-      scaleControlValue.value = number + '%';
-    }
 
     if (scaleBtn === scaleSmallerBtn && currentValueNumber > MIN_SCALE_SIZE) {
       currentValueNumber -= SCALE_STEP;
@@ -168,5 +168,9 @@
   effectsList.addEventListener('click', effectClickHandler);
   effectLevelPin.addEventListener('mousedown', pinMoveHandler);
   imgUploadScale.addEventListener('click', scaleBtnClickHandler);
+
+  window.effects = {
+    setNewScale: setNewScale
+  };
 
 })();

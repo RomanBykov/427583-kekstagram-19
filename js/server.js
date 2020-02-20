@@ -4,17 +4,61 @@
   var URL = 'https://js.dump.academy/kekstagram/';
   var TIMEOUT_IN_MS = 10000;
   var SUCCESS_CODE = 200;
+  var ESCAPE_KEY = 27;
   var pageBody = document.querySelector('body');
-  var errorMessageStyle = 'z-index: 100; margin: 0 auto; padding: 12px; text-align: center; background-color: red; position: absolute; left: 0; right: 0; font-size: 30px;';
+  var pageMain = pageBody.querySelector('main');
+  var errorTemplate = pageBody.querySelector('#error').content.querySelector('.error');
+  var successTemplate = pageBody.querySelector('#success').content.querySelector('.success');
 
-  function errorHandler(errorMessage) {
-    var errorMessageElement = document.createElement('div');
-    errorMessageElement.style = errorMessageStyle;
-    errorMessageElement.textContent = errorMessage;
-    pageBody.insertAdjacentElement('afterbegin', errorMessageElement);
+  function messageEscapePressHandler(evt) {
+    if (evt.keyCode === ESCAPE_KEY) {
+      removeMessageCloseListeners();
+    }
   }
 
-  function makeRequest(succesHandler) {
+  function messageCloseClickHandler() {
+    removeMessageCloseListeners();
+  }
+
+  function removeMessageCloseListeners() {
+    document.removeEventListener('click', messageCloseClickHandler);
+    document.removeEventListener('keydown', messageEscapePressHandler);
+
+    if (pageMain.contains(pageMain.querySelector('.error'))) {
+      pageMain.removeChild(pageMain.querySelector('.error'));
+    }
+
+    if (pageMain.contains(pageMain.querySelector('.success'))) {
+      pageMain.removeChild(pageMain.querySelector('.success'));
+    }
+  }
+
+  function addMessageListeners() {
+    document.addEventListener('click', messageCloseClickHandler);
+    document.addEventListener('keydown', messageEscapePressHandler);
+  }
+
+  function renderErrorMessage(errorMessage) {
+    var errorElement = errorTemplate.cloneNode(true);
+    var errorFragment = document.createDocumentFragment();
+
+    errorElement.querySelector('.error__title').textContent = errorMessage;
+    errorFragment.appendChild(errorElement);
+    pageMain.appendChild(errorFragment);
+    addMessageListeners();
+  }
+
+  function renderSuccessMessage() {
+    var successElement = successTemplate.cloneNode(true);
+    var successFragment = document.createDocumentFragment();
+
+    successFragment.appendChild(successElement);
+    pageMain.appendChild(successFragment);
+    addMessageListeners();
+  }
+
+
+  function makeRequest(succesHandler, errorHandler) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     xhr.timeout = TIMEOUT_IN_MS;
@@ -38,15 +82,25 @@
     return xhr;
   }
 
-  function load(succesHandler) {
-    var xhr = makeRequest(succesHandler);
+  function load(succesHandler, errorHandler) {
+    var xhr = makeRequest(succesHandler, errorHandler);
 
     xhr.open('GET', URL + 'data');
     xhr.send();
   }
 
+  function save(data, succesHandler, errorHandler) {
+    var xhr = makeRequest(succesHandler, errorHandler);
+
+    xhr.open('POST', URL);
+    xhr.send(data);
+  }
+
   window.server = {
-    load: load
+    load: load,
+    save: save,
+    renderErrorMessage: renderErrorMessage,
+    renderSuccessMessage: renderSuccessMessage
   };
 
 })();

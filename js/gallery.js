@@ -4,6 +4,8 @@
   var pageBody = document.querySelector('body');
   var pictureTemplate = pageBody.querySelector('#picture').content.querySelector('.picture');
   var picturesList = pageBody.querySelector('.pictures');
+  // var pageMain = pageBody.querySelector('main');
+  // var errorTemplate = pageBody.querySelector('#error').content.querySelector('.error');
   var loadedPhotos = {};
 
   // Рендерит фотографию на основе данных из массива
@@ -53,22 +55,35 @@
     return loadedPhotos;
   }
 
+  function loadErrorHandler(errorMessage) {
+    window.server.renderErrorMessage(errorMessage);
+  }
+
   function loadSucceshandler(photos) {
     getLoadedPhotos(photos);
     insertPhotosOnPage(photos);
   }
 
+  function removePicturesHandlers(element) {
+    element.removeEventListener('click', pictureClickHandler);
+    element.removeEventListener('keydown', picturePressHandler);
+  }
+
+  function addPicturesHandlers(element) {
+    element.addEventListener('click', pictureClickHandler);
+    element.addEventListener('keydown', picturePressHandler);
+  }
+
   function initGallery() {
-    window.server.load(loadSucceshandler);
-    picturesList.addEventListener('click', pictureClickHandler);
-    picturesList.addEventListener('keydown', picturePressHandler);
+    window.server.load(loadSucceshandler, loadErrorHandler);
+    addPicturesHandlers(picturesList);
   }
 
   initGallery();
 
   window.gallery = {
-    pictureClickHandler: pictureClickHandler,
-    picturePressHandler: picturePressHandler
+    removePicturesHandlers: removePicturesHandlers,
+    addPicturesHandlers: addPicturesHandlers
   };
 
 })();
