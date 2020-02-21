@@ -2,33 +2,8 @@
 
 (function () {
   var pageBody = document.querySelector('body');
-  var pictureTemplate = pageBody.querySelector('#picture').content.querySelector('.picture');
   var picturesList = pageBody.querySelector('.pictures');
-  // var pageMain = pageBody.querySelector('main');
-  // var errorTemplate = pageBody.querySelector('#error').content.querySelector('.error');
   var loadedPhotos = {};
-
-  // Рендерит фотографию на основе данных из массива
-  function renderPhoto(photo) {
-    var photoElement = pictureTemplate.cloneNode(true);
-
-    photoElement.querySelector('.picture__img').src = photo.url;
-    photoElement.querySelector('.picture__likes').textContent = photo.likes;
-    photoElement.querySelector('.picture__comments').textContent = photo.comments.length;
-
-    return photoElement;
-  }
-
-  // Вставляет отрендеренные фотографии на страницу
-  function insertPhotosOnPage(photosArr) {
-    var picturesFragment = document.createDocumentFragment();
-
-    for (var i = 0; i < photosArr.length; i++) {
-      picturesFragment.appendChild(renderPhoto(photosArr[i]));
-    }
-
-    picturesList.appendChild(picturesFragment);
-  }
 
   function picturePressHandler(evt) {
     var target = evt.target;
@@ -49,19 +24,13 @@
     }
   }
 
-  function getLoadedPhotos(photosFromServer) {
-    loadedPhotos = photosFromServer;
-
-    return loadedPhotos;
-  }
-
   function loadErrorHandler(errorMessage) {
     window.server.renderErrorMessage(errorMessage);
   }
 
   function loadSucceshandler(photos) {
-    getLoadedPhotos(photos);
-    insertPhotosOnPage(photos);
+    loadedPhotos = photos;
+    window.render.renderPhotos(photos);
   }
 
   function removePicturesHandlers(element) {
