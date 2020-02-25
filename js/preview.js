@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var ENTER_KEY = 13;
+  var ESCAPE_KEY = 27;
   var pageBody = document.querySelector('body');
   var bigPicture = pageBody.querySelector('.big-picture');
   var bigPictureImg = bigPicture.querySelector('.big-picture__img');
@@ -17,7 +19,7 @@
     bigPictureLikesCount.textContent = bigPhoto.likes;
     bigPictureCommentsCount.textContent = bigPhoto.comments.length;
     bigPicture.querySelector('.social__caption').textContent = bigPhoto.description;
-    window.common.removeElementsFromParrent(bigPictureComments);
+    window.util.removeElementsFromParrent(bigPictureComments);
     window.comments.appendCommentsOnBigPhoto(bigPhoto.comments);
   }
 
@@ -38,13 +40,13 @@
   }
 
   function closeBigPhotoEscPressHandler(evt) {
-    if (evt.keyCode === window.common.ESCAPE_KEY) {
+    if (evt.keyCode === ESCAPE_KEY) {
       closeBigPhoto();
     }
   }
 
   function closeBigPhotoPressHandler(evt) {
-    if (evt.keyCode === window.common.ENTER_KEY) {
+    if (evt.keyCode === ENTER_KEY) {
       closeBigPhoto();
     }
   }

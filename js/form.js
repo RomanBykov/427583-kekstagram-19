@@ -4,7 +4,7 @@
   var MAX_HASHTAGS_LENGTH = 5;
   var MAX_HASHTAG_LENGTH = 20;
   var DEFAULT_IMAGE_VALUE = 100;
-  var ErrorMessage = {
+  var errorMessageMap = {
     doubleHashtag: 'один и тот же хэш-тег не может быть использован дважды',
     maxCount: 'нельзя указать больше пяти хэш-тегов',
     badFirstSymbol: 'хэш-тег начинается с символа # (решётка)',
@@ -37,14 +37,14 @@
   }
 
   function closePopupPressHandler(evt) {
-    if (evt.keyCode === window.common.ENTER_KEY) {
+    if (evt.keyCode === window.util.ENTER_KEY) {
       closeEditingPopup();
     }
   }
 
   function escapePressHandler(evt) {
     var target = evt.target;
-    if (evt.keyCode === window.common.ESCAPE_KEY && target !== hashtagInput && target !== imgUploadDescription) {
+    if (evt.keyCode === window.util.ESCAPE_KEY && target !== hashtagInput && target !== imgUploadDescription) {
       closeEditingPopup();
     }
   }
@@ -69,28 +69,28 @@
     hashtags.forEach(function (hashtag) {
       switch (true) {
         case hasRepeats:
-          hashtagInput.setCustomValidity(ErrorMessage.doubleHashtag);
+          hashtagInput.setCustomValidity(errorMessageMap.doubleHashtag);
           break;
         case hashtags.length > MAX_HASHTAGS_LENGTH:
-          hashtagInput.setCustomValidity(ErrorMessage.maxCount);
+          hashtagInput.setCustomValidity(errorMessageMap.maxCount);
           break;
         case hashtag === '':
-          hashtagInput.setCustomValidity(ErrorMessage.noError);
+          hashtagInput.setCustomValidity(errorMessageMap.noError);
           break;
         case (hashtag.length > 1 && hashtag.charAt(0) !== '#'):
-          hashtagInput.setCustomValidity(ErrorMessage.badFirstSymbol);
+          hashtagInput.setCustomValidity(errorMessageMap.badFirstSymbol);
           break;
         case (hashtag.length > MAX_HASHTAG_LENGTH):
-          hashtagInput.setCustomValidity(ErrorMessage.maxLength);
+          hashtagInput.setCustomValidity(errorMessageMap.maxLength);
           break;
         case (hashtag.length < 2 && hashtag.charAt(0) === '#'):
-          hashtagInput.setCustomValidity(ErrorMessage.minLength);
+          hashtagInput.setCustomValidity(errorMessageMap.minLength);
           break;
         case (!hashtag.substring(1).match(/^[a-zа-я0-9]/gi, '')):
-          hashtagInput.setCustomValidity(ErrorMessage.badInputs);
+          hashtagInput.setCustomValidity(errorMessageMap.badInputs);
           break;
         default:
-          hashtagInput.setCustomValidity(ErrorMessage.noError);
+          hashtagInput.setCustomValidity(errorMessageMap.noError);
       }
     });
   }
@@ -99,13 +99,13 @@
   function validateHashtags() {
     var hashtags = hashtagInput.value.split(' ');
 
-    return hashtags.length > 0 ? validateHashtagItem(hashtags) : hashtagInput.setCustomValidity(ErrorMessage.noError);
+    return hashtags.length > 0 ? validateHashtagItem(hashtags) : hashtagInput.setCustomValidity(errorMessageMap.noError);
   }
 
   function descritionErrorHandler(evt) {
     var target = evt.target;
 
-    return target.validity.tooLong ? imgUploadDescription.setCustomValidity(ErrorMessage.maxDescriptionLength) : imgUploadDescription.setCustomValidity(ErrorMessage.noError);
+    return target.validity.tooLong ? imgUploadDescription.setCustomValidity(errorMessageMap.maxDescriptionLength) : imgUploadDescription.setCustomValidity(errorMessageMap.noError);
   }
 
   function setImageToDefault() {

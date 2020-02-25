@@ -23,8 +23,8 @@
   var scaleBiggerBtn = imgUploadScale.querySelector('.scale__control--bigger');
 
   function getEffectLevel() {
-    var lineCoords = window.common.getCoords(effectLevelLine);
-    var pinCoords = window.common.getCoords(effectLevelPin);
+    var lineCoords = window.util.getCoords(effectLevelLine);
+    var pinCoords = window.util.getCoords(effectLevelPin);
 
     return Math.round((pinCoords.left + EFFECT_PIN_OFFSET - lineCoords.left) * 100 / lineCoords.width);
   }
