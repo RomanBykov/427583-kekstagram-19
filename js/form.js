@@ -37,14 +37,14 @@
   }
 
   function closePopupPressHandler(evt) {
-    if (evt.keyCode === window.common.ENTER_KEY) {
+    if (evt.keyCode === window.util.ENTER_KEY) {
       closeEditingPopup();
     }
   }
 
   function escapePressHandler(evt) {
     var target = evt.target;
-    if (evt.keyCode === window.common.ESCAPE_KEY && target !== hashtagInput && target !== imgUploadDescription) {
+    if (evt.keyCode === window.util.ESCAPE_KEY && target !== hashtagInput && target !== imgUploadDescription) {
       closeEditingPopup();
     }
   }

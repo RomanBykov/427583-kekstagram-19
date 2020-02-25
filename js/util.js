@@ -1,9 +1,6 @@
 'use strict';
 
 (function () {
-  var ENTER_KEY = 13;
-  var ESCAPE_KEY = 27;
-
   function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -44,13 +41,12 @@
     };
   }
 
-  window.common = {
+  window.util = {
     getRandomInt: getRandomInt,
     getRandomArray: getRandomArray,
     removeElementsFromParrent: removeElementsFromParrent,
-    ENTER_KEY: ENTER_KEY,
-    ESCAPE_KEY: ESCAPE_KEY,
-    getCoords: getCoords
+    getCoords: getCoords,
+    shuffle: shuffle
   };
 
 })();

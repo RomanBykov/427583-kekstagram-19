@@ -4,6 +4,7 @@
   var pageBody = document.querySelector('body');
   var pictureTemplate = pageBody.querySelector('#picture').content.querySelector('.picture');
   var picturesList = pageBody.querySelector('.pictures');
+
   // Рендерит фотографию на основе данных из массива
   function renderPhoto(photo) {
     var photoElement = pictureTemplate.cloneNode(true);
@@ -18,6 +19,10 @@
   // Вставляет отрендеренные фотографии на страницу
   function renderPhotos(photosArr) {
     var picturesFragment = document.createDocumentFragment();
+
+    while (picturesList.lastChild.tagName === 'A') {
+      picturesList.removeChild(picturesList.lastChild);
+    }
 
     for (var i = 0; i < photosArr.length; i++) {
       picturesFragment.appendChild(renderPhoto(photosArr[i]));
