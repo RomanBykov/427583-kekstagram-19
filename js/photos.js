@@ -17,7 +17,7 @@
   }
 
   // Вставляет отрендеренные фотографии на страницу
-  function renderPhotos(photosArr) {
+  function render(photosArr) {
     var picturesFragment = document.createDocumentFragment();
 
     while (picturesList.lastChild.tagName === 'A') {
@@ -31,8 +31,8 @@
     picturesList.appendChild(picturesFragment);
   }
 
-  window.render = {
-    renderPhotos: renderPhotos
+  window.photos = {
+    render: render
   };
 
 })();
