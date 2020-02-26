@@ -57,7 +57,6 @@
     addMessageListeners();
   }
 
-
   function makeRequest(succesHandler, errorHandler) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
