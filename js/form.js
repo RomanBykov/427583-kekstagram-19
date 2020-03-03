@@ -4,7 +4,7 @@
   var MAX_HASHTAGS_LENGTH = 5;
   var MAX_HASHTAG_LENGTH = 20;
   var DEFAULT_IMAGE_VALUE = 100;
-  var errorMessageMap = {
+  var ErrorMessage = {
     doubleHashtag: 'один и тот же хэш-тег не может быть использован дважды',
     maxCount: 'нельзя указать больше пяти хэш-тегов',
     badFirstSymbol: 'хэш-тег начинается с символа # (решётка)',
@@ -62,6 +62,16 @@
     return hasRepeats;
   }
 
+  function showValidityError(element, errorText) {
+    element.setCustomValidity(errorText);
+    element.classList.add('error-input');
+  }
+
+  function hideValidityError(element) {
+    element.setCustomValidity(ErrorMessage.noError);
+    element.classList.remove('error-input');
+  }
+
   // Проверяет текущий хештег, их количество и наличие дубликатов
   function validateHashtagItem(hashtags) {
     var hasRepeats = checkHashtagRepeats(hashtags);
@@ -69,28 +79,29 @@
     hashtags.forEach(function (hashtag) {
       switch (true) {
         case hasRepeats:
-          hashtagInput.setCustomValidity(errorMessageMap.doubleHashtag);
+          showValidityError(hashtagInput, ErrorMessage.doubleHashtag);
           break;
         case hashtags.length > MAX_HASHTAGS_LENGTH:
-          hashtagInput.setCustomValidity(errorMessageMap.maxCount);
+          showValidityError(hashtagInput, ErrorMessage.maxCount);
           break;
         case hashtag === '':
-          hashtagInput.setCustomValidity(errorMessageMap.noError);
+          showValidityError(hashtagInput, ErrorMessage.noError);
           break;
         case (hashtag.length > 1 && hashtag.charAt(0) !== '#'):
-          hashtagInput.setCustomValidity(errorMessageMap.badFirstSymbol);
+          showValidityError(hashtagInput, ErrorMessage.badFirstSymbol);
           break;
         case (hashtag.length > MAX_HASHTAG_LENGTH):
-          hashtagInput.setCustomValidity(errorMessageMap.maxLength);
+          showValidityError(hashtagInput, ErrorMessage.maxLength);
           break;
         case (hashtag.length < 2 && hashtag.charAt(0) === '#'):
-          hashtagInput.setCustomValidity(errorMessageMap.minLength);
+          showValidityError(hashtagInput, ErrorMessage.minLength);
           break;
         case (!hashtag.substring(1).match(/^[a-zа-я0-9]/gi, '')):
-          hashtagInput.setCustomValidity(errorMessageMap.badInputs);
+          showValidityError(hashtagInput, ErrorMessage.badInputs);
           break;
         default:
-          hashtagInput.setCustomValidity(errorMessageMap.noError);
+          hideValidityError(hashtagInput);
+          break;
       }
     });
   }
@@ -99,13 +110,13 @@
   function validateHashtags() {
     var hashtags = hashtagInput.value.split(' ');
 
-    return hashtags.length > 0 ? validateHashtagItem(hashtags) : hashtagInput.setCustomValidity(errorMessageMap.noError);
+    return hashtags.length > 0 ? validateHashtagItem(hashtags) : hashtagInput.setCustomValidity(ErrorMessage.noError);
   }
 
   function descritionErrorHandler(evt) {
     var target = evt.target;
 
-    return target.validity.tooLong ? imgUploadDescription.setCustomValidity(errorMessageMap.maxDescriptionLength) : imgUploadDescription.setCustomValidity(errorMessageMap.noError);
+    return target.validity.tooLong ? showValidityError(imgUploadDescription, ErrorMessage.maxDescriptionLength) : hideValidityError(imgUploadDescription);
   }
 
   function setImageToDefault() {
@@ -125,6 +136,21 @@
     closeEditBtn.addEventListener('keydown', closePopupPressHandler);
     document.addEventListener('keydown', escapePressHandler);
     window.gallery.removePicturesHandlers(picturesList);
+    uploadFileImage();
+  }
+
+  function uploadFileImage() {
+    var reader = new FileReader();
+    var file = uploadFile.files[0];
+    var preview = imgUploadPreview.querySelector('img');
+
+    function fileLoadHandler() {
+      preview.src = reader.result;
+      reader.removeEventListener('load', fileLoadHandler);
+    }
+
+    reader.addEventListener('load', fileLoadHandler);
+    reader.readAsDataURL(file);
   }
 
   function closeEditingPopup() {

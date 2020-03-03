@@ -22,6 +22,26 @@
   var scaleSmallerBtn = imgUploadScale.querySelector('.scale__control--smaller');
   var scaleBiggerBtn = imgUploadScale.querySelector('.scale__control--bigger');
 
+  var Coordinate = function (x) {
+    this.x = x;
+    this.shift = 0;
+  };
+
+  Coordinate.prototype = {
+    setX: function (x) {
+      this.x = x;
+    },
+    getX: function () {
+      return this.x;
+    },
+    setShift: function (x) {
+      this.shift = this.getX() - x;
+    },
+    getShift: function () {
+      return this.shift;
+    }
+  };
+
   function getEffectLevel() {
     var lineCoords = window.util.getCoords(effectLevelLine);
     var pinCoords = window.util.getCoords(effectLevelPin);
@@ -30,7 +50,7 @@
   }
 
   function getNewPosition(shiftValue) {
-    var position = effectLevelPin.offsetLeft - shiftValue.x;
+    var position = effectLevelPin.offsetLeft - shiftValue;
 
     if (position > MAX_PIN_POSITION) {
       position = MAX_PIN_POSITION;
@@ -45,25 +65,18 @@
     evt.preventDefault();
 
     var isDragged = false;
-
-    var startCoords = {
-      x: evt.clientX
-    };
+    var coords = new Coordinate(evt.clientX);
 
     function mouseMoveHandler(moveEvt) {
       moveEvt.preventDefault();
 
+      var moveX = moveEvt.clientX;
       isDragged = true;
 
-      var shift = {
-        x: startCoords.x - moveEvt.clientX
-      };
+      coords.setShift(moveX);
+      coords.setX(moveX);
 
-      startCoords = {
-        x: moveEvt.clientX
-      };
-
-      effectLevelPin.style.left = getNewPosition(shift);
+      effectLevelPin.style.left = getNewPosition(coords.getShift());
       setEffect();
     }
 
